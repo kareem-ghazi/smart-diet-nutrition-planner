@@ -1,64 +1,72 @@
 import numpy as np
 import pandas as pd
-from scipy.optimize import linprog
 
 class MealOptimizer:
     """
-    Selection Optimization using Linear Programming (OT).
-    Finds a set of 3-5 meals that best matches the calorie target.
+    Selection Optimization using Greedy Search (OT).
+    Generates 3 different meals (Breakfast, Lunch, Dinner), 
+    each consisting of 3-4 food combinations.
+    Optimizes to reach the target daily intake.
     """
-    def select_meals(self, menu_df, target_calories, min_meals=3, max_meals=5):
+    def select_daily_plan(self, menu_df, target_calories):
         """
-        Selects meals from the menu_df to match target_calories.
+        Generates a full day plan with 3 meals.
         """
         if menu_df.empty:
-            return pd.DataFrame()
-            
-        n_items = len(menu_df)
-        calories = menu_df['calories'].values
-        
-        # Constraints: 
-        # 1. Sum(calories * x) ~= target_calories (Equality constraint)
-        # 2. Sum(x) >= min_meals
-        # 3. Sum(x) <= max_meals
-        # 4. x is binary (0 or 1) - using bounds [0, 1] for relaxation
-        
-        # Objective: minimize difference from target_calories
-        # Since we use linprog, we set an objective to minimize sum(x) but we 
-        # mainly focus on the calorie constraint.
-        # Alternatively, minimize the absolute difference: minimize |Sum(cal*x) - target|
-        # This is more complex for linprog. We'll simplify:
-        # Objective: minimize error in calories. 
-        # But linprog doesn't natively handle absolute error easily.
-        
-        # Simpler approach for prototype: find a feasible solution for the target window +/- 10%
-        # c = [0] * n_items (any feasible solution)
-        
-        # A_eq = [calories]
-        # b_eq = [target_calories]
-        
-        # Instead, let's use a greedy fallback if LP is too rigid for the small dataset.
-        return self._greedy_selection(menu_df, target_calories, min_meals, max_meals)
+            return {}
 
-    def _greedy_selection(self, menu_df, target_calories, min_meals, max_meals):
-        """
-        Greedy fallback for meal selection (prototype stability).
-        Sorts items by calories/protein and picks until target reached.
-        """
-        sorted_df = menu_df.sample(frac=1).copy() # Randomize selection a bit
-        selected_items = []
-        current_calories = 0
+        # Split menu by meal type
+        breakfast_menu = menu_df[menu_df['Meal_Type'] == 'Breakfast']
+        lunch_menu = menu_df[menu_df['Meal_Type'] == 'Lunch']
+        dinner_menu = menu_df[menu_df['Meal_Type'] == 'Dinner']
         
-        for _, row in sorted_df.iterrows():
-            if current_calories + row['calories'] <= target_calories * 1.05: # 5% over buffer
-                selected_items.append(row)
-                current_calories += row['calories']
-                if len(selected_items) >= max_meals:
-                    break
-                    
-        # Ensure minimum meals
-        if len(selected_items) < min_meals:
-            # Just take the smallest 3 if we can't meet target gracefully
-            selected_items = sorted_df.nsmallest(min_meals, 'calories').to_dict('records')
+        # Fallback if specific categories are empty
+        if breakfast_menu.empty: breakfast_menu = menu_df
+        if lunch_menu.empty: lunch_menu = menu_df
+        if dinner_menu.empty: dinner_menu = menu_df
+
+        # Target distribution: 25% Breakfast, 35% Lunch, 40% Dinner
+        plan = {
+            "Breakfast": self._select_meal_items(breakfast_menu, target_calories * 0.25),
+            "Lunch": self._select_meal_items(lunch_menu, target_calories * 0.35),
+            "Dinner": self._select_meal_items(dinner_menu, target_calories * 0.40)
+        }
+        
+        return plan
+
+    def _select_meal_items(self, meal_menu, target_meal_calories, min_items=3, max_items=4):
+        """
+        Selects 3-4 items for a single meal to reach target_meal_calories.
+        """
+        if meal_menu.empty:
+            return pd.DataFrame()
+
+        calorie_col = 'Calories (kcal)'
+        
+        # We'll use a slightly more sophisticated greedy approach:
+        # 1. Start with a random set of 3 items.
+        # 2. If below target, try to swap items or add a 4th to get closer.
+        
+        best_items = []
+        best_diff = float('inf')
+        
+        # Try multiple random iterations to find the "best" combination
+        for _ in range(50):
+            # Pick number of items
+            num_items = np.random.randint(min_items, max_items + 1)
+            if len(meal_menu) < num_items:
+                current_selection = meal_menu
+            else:
+                current_selection = meal_menu.sample(n=num_items)
             
-        return pd.DataFrame(selected_items)
+            current_calories = current_selection[calorie_col].sum()
+            diff = abs(current_calories - target_meal_calories)
+            
+            if diff < best_diff:
+                best_diff = diff
+                best_items = current_selection
+                
+            if best_diff < 10: # Close enough
+                break
+                
+        return best_items
