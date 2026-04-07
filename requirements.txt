@@ -1,0 +1,7 @@
+streamlit
+tensorflow
+pandas
+scipy
+pytest
+flake8
+black
