@@ -14,9 +14,9 @@ def load_food_data(file_path="data/foods_dataset.csv"):
     return pd.read_csv(file_path)
 
 @st.cache_data
-def load_user_profiles(file_path="data/calorie_intake_dataset.csv"):
+def load_user_profiles(file_path="data/calorie_intake_dataset_2.csv"):
     """
-    Loads the user profile/calorie intake dataset.
+    Loads the new user profile/calorie intake dataset.
     """
     if not os.path.exists(file_path):
         return pd.DataFrame()
