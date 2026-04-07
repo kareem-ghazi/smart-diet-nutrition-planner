@@ -24,14 +24,17 @@ streamlit run src/app.py
 ```
 
 ## Application Flow
-1. **Sidebar**: Enter your Age, Weight, Height, and Activity Level.
-2. **Allergies**: Select any allergies to filter the food menu.
-3. **NN Prediction**: View your predicted daily calorie needs.
-4. **KBS Filter**: Review the safety-validated food menu.
-5. **OT Selection**: See the optimized daily meal plan that fits your needs.
+1. **Sidebar**: 
+   - **Presets**: Select a Patient ID from the "Load Patient Profile" dropdown to test the model with unseen samples (10 reserved test cases).
+   - **Manual Input**: Fill out the full clinical profile including Cholesterol, Blood Pressure, and Glucose.
+2. **NN Prediction**: The MLP model (64-32 architecture) processes all 18 features using a scikit-learn preprocessing pipeline to predict target calories.
+3. **KBS Filter**: The Knowledge-Based System validates the food menu against your allergies and restrictions.
+4. **OT Selection**: The Optimization Theory layer selects 3 meals (Breakfast, Lunch, Dinner) with 3-4 items each to match the target.
 
 ## Data Requirements
-The application uses `data/diet_recommendations.csv`. A sample version is included for testing.
+The application requires:
+- `data/foods_dataset.csv`
+- `data/calorie_intake_dataset.csv`
 
 ## Testing
 ```bash
