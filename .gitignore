@@ -19,3 +19,8 @@ data/*.csv
 .DS_Store
 .vscode/
 .idea/
+specs/
+.specify/
+.gemini/
+GEMINI.md
+tests/
