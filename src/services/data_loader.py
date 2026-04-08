@@ -14,7 +14,7 @@ def load_food_data(file_path="data/foods_dataset.csv"):
     return pd.read_csv(file_path)
 
 @st.cache_data
-def load_user_profiles(file_path="data/calorie_intake_dataset_2.csv"):
+def load_user_profiles(file_path="data/calorie_intake_dataset.csv"):
     """
     Loads the new user profile/calorie intake dataset.
     """

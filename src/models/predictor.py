@@ -23,7 +23,7 @@ class CaloriePredictor:
 
     def _initialize(self):
         print("\n=== Initializing Robust Calorie Predictor Training (Dataset V2) ===")
-        data_path = "data/calorie_intake_dataset_2.csv"
+        data_path = "data/calorie_intake_dataset.csv"
         if not os.path.exists(data_path):
             st.error("Training data not found!")
             return
