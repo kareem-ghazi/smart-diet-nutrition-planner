@@ -8,12 +8,15 @@ class MealOptimizer:
     each consisting of 3-4 food combinations.
     Optimizes to reach the target daily intake.
     """
-    def select_daily_plan(self, menu_df, target_calories):
+    def select_daily_plan(self, menu_df, target_calories, percentages=None):
         """
         Generates a full day plan with 3 meals.
         """
         if menu_df.empty:
             return {}
+
+        if percentages is None:
+            percentages = {"Breakfast": 0.25, "Lunch": 0.35, "Dinner": 0.40}
 
         # Split menu by meal type
         breakfast_menu = menu_df[menu_df['Meal_Type'] == 'Breakfast']
@@ -21,15 +24,18 @@ class MealOptimizer:
         dinner_menu = menu_df[menu_df['Meal_Type'] == 'Dinner']
         
         # Fallback if specific categories are empty
-        if breakfast_menu.empty: breakfast_menu = menu_df
-        if lunch_menu.empty: lunch_menu = menu_df
-        if dinner_menu.empty: dinner_menu = menu_df
+        if breakfast_menu.empty:
+            breakfast_menu = menu_df
+        if lunch_menu.empty:
+            lunch_menu = menu_df
+        if dinner_menu.empty:
+            dinner_menu = menu_df
 
-        # Target distribution: 25% Breakfast, 35% Lunch, 40% Dinner
+        # Target distribution
         plan = {
-            "Breakfast": self._select_meal_items(breakfast_menu, target_calories * 0.25),
-            "Lunch": self._select_meal_items(lunch_menu, target_calories * 0.35),
-            "Dinner": self._select_meal_items(dinner_menu, target_calories * 0.40)
+            "Breakfast": self._select_meal_items(breakfast_menu, target_calories * percentages.get("Breakfast", 0.25)),
+            "Lunch": self._select_meal_items(lunch_menu, target_calories * percentages.get("Lunch", 0.35)),
+            "Dinner": self._select_meal_items(dinner_menu, target_calories * percentages.get("Dinner", 0.40))
         }
         
         return plan

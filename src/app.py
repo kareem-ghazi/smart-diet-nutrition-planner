@@ -1,10 +1,9 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 from services.data_loader import load_food_data
 from models.predictor import get_predictor
 from models.optimizer import MealOptimizer
-from models.filter import AllergyFilter
+from models.filter import FoodFilter
 
 def add_custom_css():
     st.markdown("""
@@ -66,7 +65,7 @@ def main():
         test_samples_df = pd.DataFrame(test_samples_df)
     
     # Option to load from dataset (using the 10 test samples)
-    st.sidebar.subheader("Presets (Test Samples)")
+    st.sidebar.subheader("Presets")
     selected_id = st.sidebar.selectbox(
         "Load ID Profile", 
         ["Manual"] + test_samples_df['ID'].astype(str).tolist() if not test_samples_df.empty else ["Manual"]
@@ -86,7 +85,7 @@ def main():
     working_type_opts = ["Unemployed", "Desk Job", "Freelancer", "Healthcare", "Service Industry", "Education", "Other"]
     working_type = st.sidebar.selectbox("Working Type", working_type_opts, index=safe_index(working_type_opts, defaults.get('Working_Type', 'Desk Job')))
     
-    sleep_hours = st.sidebar.slider("Sleep Hours", 0.0, 24.0, float(defaults.get('Sleep_Hours', 7.0)))
+    sleep_hours = st.sidebar.number_input("Sleep Hours", 0.0, 24.0, float(defaults.get('Sleep_Hours', 7.0)))
     height_m = st.sidebar.number_input("Height (meters)", 0.5, 2.5, float(defaults.get('Height_m', 1.75)))
     
     # Preferences & Restrictions (Still needed for KBS part)
@@ -94,6 +93,22 @@ def main():
     st.sidebar.subheader("Dietary Filters")
     all_allergies = ["None", "Peanuts", "Gluten", "Dairy", "Eggs", "Soy", "Fish"]
     selected_allergies = st.sidebar.multiselect("Allergies / Restrictions", all_allergies)
+    
+    health_opts = ["Diabetes", "Hypertension", "Obesity"]
+    selected_health = st.sidebar.multiselect("Health Conditions", health_opts)
+    
+    cuisine_opts = ["All", "Mediterranean", "Asian", "American", "Indian", "Mexican", "Others"]
+    selected_cuisine = st.sidebar.selectbox("Cuisine", cuisine_opts)
+
+    st.sidebar.markdown("---")
+    st.sidebar.subheader("Meal Percentages")
+    cp1, cp2, cp3 = st.sidebar.columns(3)
+    p_breakfast = cp1.number_input("Breakfast (%)", 0, 100, 25) / 100
+    p_lunch = cp2.number_input("Lunch (%)", 0, 100, 35) / 100
+    p_dinner = cp3.number_input("Dinner (%)", 0, 100, 40) / 100
+    
+    if abs((p_breakfast + p_lunch + p_dinner) - 1.0) > 0.01:
+        st.sidebar.warning("Percentages should sum to 100%!")
     
     # Construct the dictionary for prediction
     user_profile_dict = {
@@ -129,11 +144,21 @@ def main():
     with col2:
         st.header("Filtered Menu")
         raw_food_data = load_food_data()
-        allergy_filter = AllergyFilter()
+        food_filter = FoodFilter()
         
-        filtered_menu = allergy_filter.filter_menu(raw_food_data, selected_allergies)
+        if (selected_cuisine != None):
+            filtered_menu = food_filter.filter_menu(
+                raw_food_data, 
+                selected_allergies, 
+                selected_health, 
+                selected_cuisine
+            )
         
-        st.dataframe(filtered_menu[['Food_Item', 'Category', 'Calories (kcal)', 'Meal_Type']], 
+        display_cols = ['Food_Item', 'Category', 'Calories (kcal)', 'Meal_Type']
+        if selected_cuisine != "All":
+            display_cols.append('Cuisine')
+        
+        st.dataframe(filtered_menu[display_cols], 
                      use_container_width=True, hide_index=True)
         st.success(f"Safety Filter: {len(filtered_menu)} items available.")
     
@@ -142,10 +167,12 @@ def main():
     # 3. OT (Selection)
     st.header("Optimized Daily Plan")
     optimizer = MealOptimizer()
-    plan = optimizer.select_daily_plan(filtered_menu, predicted_target)
+    meal_percentages = {"Breakfast": p_breakfast, "Lunch": p_lunch, "Dinner": p_dinner}
+    plan = optimizer.select_daily_plan(filtered_menu, predicted_target, meal_percentages)
     
     if plan:
         total_calories = 0
+        total_water = 0
         cols = st.columns(3)
         
         meal_names = ["Breakfast", "Lunch", "Dinner"]
@@ -159,21 +186,25 @@ def main():
                 
                 if not meal_df.empty:
                     for _, row in meal_df.iterrows():
+                        water_val = row.get('Water_Intake (ml)', 0)
                         st.markdown(f"""
                         <div class='meal-card'>
                             <strong>{row['Food_Item']}</strong><br/>
                             <small>{row['Category']}</small><br/>
-                            {row['Calories (kcal)']} kcal | P: {row['Protein (g)']}g
+                            {row['Calories (kcal)']} kcal | P: {row['Protein (g)']}g | W: {water_val}ml
                         </div>
                         """, unsafe_allow_html=True)
                     meal_cal = meal_df['Calories (kcal)'].sum()
+                    meal_water = meal_df['Water_Intake (ml)'].sum() if 'Water_Intake (ml)' in meal_df.columns else 0
                     st.write(f"**Meal Total**: {meal_cal:.2f} kcal")
+                    st.write(f"**Total Water**: {meal_water:.2f} ml")
                     total_calories += meal_cal
+                    total_water += meal_water
                 else:
                     st.warning("No items selected.")
         
         st.markdown("---")
-        c1, c2, c3 = st.columns(3)
+        c1, c2, c3, c4 = st.columns(4)
         with c1:
             st.metric("Total Daily Calories", f"{total_calories:.2f} kcal")
         with c2:
@@ -181,6 +212,8 @@ def main():
         with c3:
             diff = total_calories - predicted_target
             st.metric("Difference", f"{diff:.2f} kcal", delta=f"{diff:.2f}")
+        with c4:
+            st.metric("Total Water Intake", f"{total_water:.2f} ml")
     else:
         st.warning("No optimized plan could be generated.")
 

@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
 import streamlit as st
 import os
 
@@ -102,7 +103,7 @@ class CaloriePredictor:
         loss, mae = self.model.evaluate(X_test_proc, y_test_scaled, verbose=0)
         # Convert MAE back to real calorie units for reporting
         
-        if (self.target_scaler.var_ != None):
+        if (self.target_scaler.var_ is not None):
             real_mae = mae * np.sqrt(self.target_scaler.var_[0])
         
         print("\n=== Model Training Complete ===")
@@ -142,7 +143,6 @@ class CaloriePredictor:
         return self.test_samples
 
 # Utility to wrap transformers in a pipeline for predictor.py internal use
-from sklearn.pipeline import Pipeline
 
 @st.cache_resource
 def get_predictor():
