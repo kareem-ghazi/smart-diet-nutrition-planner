@@ -13,8 +13,6 @@ build/
 .coverage
 htmlcov/
 .streamlit/
-data/*.csv
-!data/diet_recommendations.csv
 .env
 .DS_Store
 .vscode/
