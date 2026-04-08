@@ -51,7 +51,7 @@ class CaloriePredictor:
 
         # 20% Test Set
         X_train, X_test, y_train, y_test = train_test_split(
-            X_working, y_working, test_size=0.20, random_state=42
+            X_working, y_working, test_size=0.05, random_state=42
         )
 
         # Robust Preprocessing pipeline
