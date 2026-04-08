@@ -52,7 +52,7 @@ def main():
     add_custom_css()
     
     st.title("🍎 Smart Diet Nutrition Planner")
-    st.markdown("A smart approach to personalized nutrition")
+    st.markdown("A smart approach to personalized nutrition.")
     st.markdown("---")
     
     # 1. Initialize Predictor & Get Test Samples
@@ -116,7 +116,7 @@ def main():
     col1, col2 = st.columns([1, 1.2])
     
     with col1:
-        st.header("1. Calculated Needs (NN)")
+        st.header("Calculated Needs")
         st.metric("Predicted Daily Target", f"{predicted_target} kcal")
         if dataset_intake > 0:
             st.metric("Dataset Original Intake", f"{dataset_intake:.2f} kcal", delta=f"{predicted_target - dataset_intake:.2f}")
@@ -127,7 +127,7 @@ def main():
             st.write(f"**Height**: {height_m} m")
     
     with col2:
-        st.header("2. Filtered Menu (KBS)")
+        st.header("Filtered Menu")
         raw_food_data = load_food_data()
         allergy_filter = AllergyFilter()
         
@@ -140,7 +140,7 @@ def main():
     st.markdown("---")
     
     # 3. OT (Selection)
-    st.header("3. Optimized Daily Plan (OT)")
+    st.header("Optimized Daily Plan")
     optimizer = MealOptimizer()
     plan = optimizer.select_daily_plan(filtered_menu, predicted_target)
     

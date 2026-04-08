@@ -51,7 +51,7 @@ class CaloriePredictor:
 
         # 20% Test Set
         X_train, X_test, y_train, y_test = train_test_split(
-            X_working, y_working, test_size=0.05, random_state=42
+            X_working, y_working, test_size=0.01, random_state=42
         )
 
         # Robust Preprocessing pipeline
@@ -87,12 +87,12 @@ class CaloriePredictor:
         print(f"Training on {len(X_train)} samples...")
         
         # Early stopping to prevent overfitting if needed
-        early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+        early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)
 
         self.model.fit(
             X_train_proc, y_train_scaled, 
             epochs=50, 
-            batch_size=32, 
+            # batch_size=32, 
             validation_data=(X_test_proc, y_test_scaled),
             callbacks=[early_stop],
             verbose=1
@@ -101,7 +101,9 @@ class CaloriePredictor:
         # Evaluation
         loss, mae = self.model.evaluate(X_test_proc, y_test_scaled, verbose=0)
         # Convert MAE back to real calorie units for reporting
-        real_mae = mae * np.sqrt(self.target_scaler.var_[0])
+        
+        if (self.target_scaler.var_ != None):
+            real_mae = mae * np.sqrt(self.target_scaler.var_[0])
         
         print("\n=== Model Training Complete ===")
         print(f"Validation Loss (MSE): {loss:.4f}")
