@@ -13,6 +13,15 @@ The **Smart Diet Nutrition Planner** is designed to provide users with a highly 
 - **Daily Meal Optimization (OT)**: Generates an optimized daily plan (Breakfast, Lunch, and Dinner) that matches your calculated caloric target while ensuring nutritional variety.
 - **Interactive Dashboard**: A clean, modern Streamlit UI for easy profile management and meal plan visualization.
 - **Preset Profiles**: Load test samples directly from the dataset to explore the planner's capabilities.
+- **Nutritional Transparency**: View detailed breakdown of Protein, Calories, and suggested Water Intake for every meal.
+
+## 📚 Documentation
+
+Extensive documentation is available in the [docs/](./docs) folder:
+- [Overview](./docs/OVERVIEW.md): Project philosophy and hybrid architecture.
+- [Technical Details](./docs/TECHNICAL_DETAILS.md): Deep dive into NN, KBS, and OT models.
+- [Dataset Documentation](./docs/DATASET.md): Detailed column descriptions and data formats.
+- [Usage Guide](./docs/USAGE.md): Step-by-step instructions for users.
 
 ## 🛠️ Tech Stack
 
@@ -65,14 +74,6 @@ streamlit run src/app.py
 ```
 
 Navigate to `http://localhost:8501` in your browser to interact with the planner.
-
-## 🧪 Testing
-
-Run the test suite using `pytest`:
-
-```bash
-pytest
-```
 
 ## 📄 License
 
