@@ -51,7 +51,7 @@ def main():
     add_custom_css()
     
     st.title("🍎 Smart Diet Nutrition Planner")
-    st.markdown("A smart approach to personalized nutrition.")
+    st.markdown("A smart approach to personalized nutrition made in New Mansoura University.")
     st.markdown("---")
     
     # 1. Initialize Predictor & Get Test Samples
@@ -216,6 +216,9 @@ def main():
             st.metric("Total Water Intake", f"{total_water:.2f} ml")
     else:
         st.warning("No optimized plan could be generated.")
+    
+    st.markdown("---")
+    st.markdown("Created by Kareem Ghazi, Khaled Adel, Mohammed Adel, and Ahmed Refaat.")
 
 if __name__ == "__main__":
     main()
