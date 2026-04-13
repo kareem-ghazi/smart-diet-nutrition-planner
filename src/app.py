@@ -12,7 +12,7 @@ def add_custom_css():
         background-color: #000000;
     }
     .stMetric {
-        background-color: #ffffff;
+        background-color: #000000;
         padding: 15px;
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
