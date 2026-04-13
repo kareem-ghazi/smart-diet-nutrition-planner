@@ -16,7 +16,6 @@ if not exist %VENV_DIR% (
     
     echo [INFO] Activating virtual environment and installing dependencies...
     call %VENV_DIR%\Scripts\activate
-    python -m pip install --upgrade pip
     pip install -r requirements.txt
     if errorlevel 1 (
         echo [ERROR] Failed to install requirements. Check your internet connection or requirements.txt.
