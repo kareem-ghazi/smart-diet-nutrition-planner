@@ -121,6 +121,9 @@ def main():
 
     st.sidebar.markdown("---")
     
+    if (st.sidebar.button("Rerun Optimizer")):
+        st.rerun()
+    
     # 2. NN (Prediction)
     predicted_target = predictor.predict(user_profile_dict)
     
@@ -154,7 +157,8 @@ def main():
                 selected_cuisine
             )
         
-        display_cols = ['Food_Item', 'Category', 'Calories (kcal)', 'Meal_Type']
+        display_cols = ['Food_Item', 'Category', 'Calories (kcal)', 'Meal_Type', 'Protein (g)',
+                        'Carbohydrates (g)', 'Fat (g)', 'Fiber (g)', 'Sugars (g)', 'Sodium (mg)', 'Cholesterol (mg)', 'Water_Intake (ml)']
         if selected_cuisine != "All":
             display_cols.append('Cuisine')
         
@@ -218,7 +222,7 @@ def main():
         st.warning("No optimized plan could be generated.")
     
     st.markdown("---")
-    st.markdown("Created by Kareem Ghazi, Khaled Adel, Mohammed Adel, and Ahmed Refaat.")
+    st.markdown("Created by Kareem Ghazi, Khaled Adel, Mohammed Adel, Ahmed Refaat, and Kareem Asaad.")
 
 if __name__ == "__main__":
     main()
