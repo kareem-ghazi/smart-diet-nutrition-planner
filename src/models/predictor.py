@@ -23,7 +23,7 @@ class CaloriePredictor:
         self._initialize()
 
     def _initialize(self):
-        print("\n=== Initializing Robust Calorie Predictor Training (Dataset V2) ===")
+        print("\n=== Initializing Robust Calorie Predictor Training ===")
         data_path = "data/calorie_intake_dataset.csv"
         if not os.path.exists(data_path):
             st.error("Training data not found!")
@@ -50,7 +50,7 @@ class CaloriePredictor:
         X_working = X.iloc[10:]
         y_working = y.iloc[10:]
 
-        # 20% Test Set
+        # 1% Test Set
         X_train, X_test, y_train, y_test = train_test_split(
             X_working, y_working, test_size=0.01, random_state=42
         )
@@ -92,9 +92,7 @@ class CaloriePredictor:
 
         self.model.fit(
             X_train_proc, y_train_scaled, 
-            epochs=50, 
-            # batch_size=32, 
-            validation_data=(X_test_proc, y_test_scaled),
+            epochs=50,
             callbacks=[early_stop],
             verbose=1
         )
@@ -137,7 +135,7 @@ class CaloriePredictor:
         # Inverse transform to get actual calories
         prediction_real = self.target_scaler.inverse_transform(prediction_scaled)
         
-        return round(float(prediction_real[0][0]), 2)
+        return round(float(prediction_real[0][0]), 0)
 
     def get_test_samples(self):
         return self.test_samples
