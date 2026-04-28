@@ -49,10 +49,6 @@ class MealOptimizer:
 
         calorie_col = 'Calories (kcal)'
         
-        # We'll use a slightly more sophisticated greedy approach:
-        # 1. Start with a random set of 3 items.
-        # 2. If below target, try to swap items or add a 4th to get closer.
-        
         best_items = []
         best_diff = float('inf')
         

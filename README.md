@@ -1,6 +1,6 @@
 # 🍎 Smart Diet Nutrition Planner
 
-A personalized, data-driven nutrition planning system that combines **Neural Networks** for calorie prediction, a **Knowledge-Based System** for dietary filtering, and an **Optimization Engine** for meal selection.
+A personalized, data-driven nutrition planning system that combines calorie prediction, dietary filtering, and meal selection in one place.
 
 ## 🚀 Overview
 

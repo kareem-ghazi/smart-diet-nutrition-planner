@@ -76,7 +76,7 @@ def main():
         patient_data = test_samples_df[test_samples_df['ID'].astype(str) == selected_id].iloc[0]
         defaults = patient_data.to_dict()
     
-    # Profile Fields (Dataset V2: Age, Gender, Working_Type, Sleep_Hours, Height_m)
+    # Profile Fields (Age, Gender, Working_Type, Sleep_Hours, Height_m)
     age = st.sidebar.number_input("Age (years)", 1, 120, int(float(defaults.get('Age', 25))))
     
     gender_opts = ["Male", "Female"]
@@ -88,7 +88,7 @@ def main():
     sleep_hours = st.sidebar.number_input("Sleep Hours", 0.0, 24.0, float(defaults.get('Sleep_Hours', 7.0)))
     height_m = st.sidebar.number_input("Height (meters)", 0.5, 2.5, float(defaults.get('Height_m', 1.75)))
     
-    # Preferences & Restrictions (Still needed for KBS part)
+    # Preferences & Restrictions
     st.sidebar.markdown("---")
     st.sidebar.subheader("Dietary Filters")
     all_allergies = ["None", "Peanuts", "Gluten", "Dairy", "Eggs", "Soy", "Fish"]
@@ -168,7 +168,7 @@ def main():
     
     st.markdown("---")
     
-    # 3. OT (Selection)
+    # 3. Selection
     st.header("Optimized Daily Plan")
     optimizer = MealOptimizer()
     meal_percentages = {"Breakfast": p_breakfast, "Lunch": p_lunch, "Dinner": p_dinner}

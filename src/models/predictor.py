@@ -34,7 +34,7 @@ class CaloriePredictor:
         # Target: Required_Daily_Calories
         target_col = "Required_Daily_Calories"
         
-        # Immediate fix: Drop rows where target is NaN before anything else
+        # Drop rows where target is NaN before anything else
         df = df.dropna(subset=[target_col])
         
         # Features
@@ -99,8 +99,8 @@ class CaloriePredictor:
 
         # Evaluation
         loss, mae = self.model.evaluate(X_test_proc, y_test_scaled, verbose=0)
-        # Convert MAE back to real calorie units for reporting
         
+        # Convert MAE back to real calorie units for reporting
         if (self.target_scaler.var_ is not None):
             real_mae = mae * np.sqrt(self.target_scaler.var_[0])
         
@@ -119,6 +119,7 @@ class CaloriePredictor:
             layers.Dense(32, activation='relu'),
             layers.Dense(1, activation='linear')
         ])
+        
         # Use a slightly lower learning rate for stability
         optimizer = tf.keras.optimizers.Adam(learning_rate=0.0005)
         model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
@@ -141,7 +142,6 @@ class CaloriePredictor:
         return self.test_samples
 
 # Utility to wrap transformers in a pipeline for predictor.py internal use
-
 @st.cache_resource
 def get_predictor():
     return CaloriePredictor()
